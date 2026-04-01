@@ -9,7 +9,7 @@ app.use(express.json())
 app.use(cors())
 
 app.get("/",(req,res)=>{
-    res.send("App is running")
+    res.send("API is running")
 })
 
 mongoose.connect(process.env.MONGO_URI)
