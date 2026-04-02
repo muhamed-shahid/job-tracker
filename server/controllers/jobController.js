@@ -71,3 +71,34 @@ exports.updateJob = async(req,res)=>{
             message:"Server error"
         })}
 }
+
+
+exports.deleteJobs = async(req,res)=>{
+    try{
+        const {id} = req.params
+
+        const job = await Job.findById(id)
+
+        if(!job){
+            return res.status(404).json({
+                message:"Job not found"
+            })
+        }
+
+        if(job.user.toString() !== req.user.id){
+            return res.status(403).json({
+                message:"Not allowed"
+            })
+        }
+
+        await job.deleteOne()
+
+        res.json({
+            success:true,
+            message:"Job deleted"
+        })
+    }catch(err){
+        res.status(500).json({
+            message:"Server error"
+        })}
+}
