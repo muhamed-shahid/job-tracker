@@ -65,9 +65,15 @@ exports.login = async (req,res)=>{
             {expiresIn:"1d"}
         )
         res.json({token})
+
+        console.log("TOKEN:",token);
     }catch(err){
         res.status(500).json({
             message:"Server error"
         })
     }
+
+    console.log("LOGIN SECRET:", process.env.JWT_SECRET);
+    
+    
 }
