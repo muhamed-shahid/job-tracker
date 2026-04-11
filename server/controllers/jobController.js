@@ -42,34 +42,46 @@ exports.getJobs = async (req,res)=>{
 
 
 
-exports.updateJob = async(req,res)=>{
-    try{
-        const {id}=req.params
-        const {status} = req.body
+exports.updateJob = async (req, res) => {
+    try {
+        const { id } = req.params
+        const { company, position, status } = req.body
+        console.log(req.body);
+        
 
         const job = await Job.findById(id)
 
-        if(!job){
+        if (!job) {
             return res.status(400).json({
-                message:"Job not found"
+                message: "Job not found"
             })
         }
 
-        if(job.user.toString() !== req.user.id){
-            return res.status(401).json({message:"Not allowed"})
+        if (job.user.toString() !== req.user.id) {
+            return res.status(401).json({
+                message: "Not allowed"
+            })
         }
 
-        job.status = status
+        // ✅ update all fields
+        job.company = company || job.company
+        job.position = position || job.position
+        job.status = status || job.status
+
         await job.save()
+
         res.json({
-            success:true,
-            message:"job updated",
-            data:job
+            success: true,
+            message: "Job updated",
+            data: job
         })
-    }catch(err){
+
+    } catch (err) {
+        console.log(err); // 🔥 ADD THIS (VERY IMPORTANT)
         res.status(500).json({
-            message:"Server error"
-        })}
+            message: "Server error"
+        })
+    }
 }
 
 
