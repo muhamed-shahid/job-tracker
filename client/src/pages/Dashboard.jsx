@@ -56,11 +56,15 @@ export default function Dashboard() {
 
     // 🔹 Delete job
     const deleteJob = async (id) => {
+        const confirmDelete = window.confirm("Are you sure?");
+        if(!confirmDelete) return
         try {
             await API.delete(`/jobs/${id}`);
+            toast.success("Job deleted")
             fetchJobs();
         } catch (err) {
             console.log(err);
+            toast.error("Delete failed")
         }
     };
 
@@ -102,7 +106,7 @@ export default function Dashboard() {
             </form>
 
             {/* 🔹 Job List */}
-            <div className="grid gap-4">
+            <div className="p-4 border rounded-lg shadow flex justify-between items-center bg-white hover:shadow-md transition">
                 {Array.isArray(jobs) && jobs.length > 0 ? (
                     jobs.map((job) => (
                         <div
@@ -114,7 +118,11 @@ export default function Dashboard() {
                                     {job.company}
                                 </h2>
                                 <p>{job.position}</p>
-                                <p className="text-sm text-gray-500">
+                                <p className={`text-sm font-semibold ${
+                                    job.status === "Applied"?"text-blue-500":
+                                    job.status === "Interview"?"text-yellow-500":
+                                    "text-red-500"
+                                    }`}>
                                     {job.status}
                                 </p>
                             </div>
@@ -125,7 +133,7 @@ export default function Dashboard() {
                                     status: job.status
                                 })
                                 setEditId(job._id)
-                            }} className="bg-yellow-500 text-white px-3 py-1 rounded mr-2">
+                            }} className="bg-yellow-500 text-white px-3 py-1 rounded hover:bg-yellow-600">
                                 Edit
 
                             </button>
