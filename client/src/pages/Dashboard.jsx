@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import API from "../services/api";
+import toast from "react-hot-toast";
 
 export default function Dashboard() {
     const [jobs, setJobs] = useState([]);
@@ -9,6 +10,8 @@ export default function Dashboard() {
         position: "",
         status: "Applied"
     });
+
+    const[editId, setEditId] = useState(null)
 
     // 🔹 Fetch jobs
     const fetchJobs = async () => {
@@ -29,19 +32,25 @@ export default function Dashboard() {
     const handleAddJob = async (e) => {
         e.preventDefault();
         try {
+            if(editId){
+                await API.put(`/jobs/${editId}`,form)
+                toast.success("Job updated")
+            }else{
             await API.post("/jobs", form);
-
+            toast.success("Job added succesfully")
+            }
             // clear form
             setForm({
                 company: "",
                 position: "",
                 status: "Applied"
             });
-                console.log(form);
                 
+             setEditId(null)   
             fetchJobs(); // refresh
         } catch (err) {
             console.log(err);
+            toast.error("Something went wrong")
         }
     };
 
@@ -109,6 +118,17 @@ export default function Dashboard() {
                                     {job.status}
                                 </p>
                             </div>
+                            <button onClick={()=>{
+                                setForm({
+                                    company:job.company,
+                                    position:job.position,
+                                    status: job.status
+                                })
+                                setEditId(job._id)
+                            }} className="bg-yellow-500 text-white px-3 py-1 rounded mr-2">
+                                Edit
+
+                            </button>
 
                             <button
                                 onClick={() => deleteJob(job._id)}
