@@ -3,10 +3,10 @@ const job = require("../models/Job")
 
 exports.addJob = async(req,res)=>{
     try{
-        const{title,company,location} = req.body
+        const{position,company,location} = req.body
 
         const job = await Job.create({
-            title,
+            position,
             company,
             location,
             user:req.user.id
