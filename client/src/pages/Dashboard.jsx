@@ -1,11 +1,13 @@
 import React, { useState, useEffect } from 'react';
-import { Loader2, MoreVertical, Edit2, Trash2 } from 'lucide-react';
+import { Loader2, MoreVertical, Edit2, Trash2, Search } from 'lucide-react';
 import toast from 'react-hot-toast';
 import API from '../services/api';
 
 const Dashboard = () => {
   const [jobs, setJobs] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
+  const[search,setSearch] = useState("")
+  const[filterStatus,setFilterStatus] = useState("All")
 
   const [showModal, setShowModal] = useState(false);
   const [editId, setEditId] = useState(null);
@@ -102,15 +104,52 @@ const Dashboard = () => {
             + Add Application
           </button>
         </div>
-
+       {/* JOB FILTER AND SEARCH */}
+               <div className="bg-white p-4 rounded-xl card-shadow border border-slate-100 mb-8 flex flex-col sm:flex-row gap-4">
+          <div className="relative flex-1">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={20} />
+            <input 
+              type="text" 
+              placeholder="Search by company or position..." 
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              className="w-full pl-10 pr-4 py-2 rounded-lg border border-slate-200 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all"
+            />
+          </div>
+          <div className="sm:w-48">
+            <select 
+              value={filterStatus}
+              onChange={(e) => setFilterStatus(e.target.value)}
+              className="w-full px-4 py-2 rounded-lg border border-slate-200 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 bg-white"
+            >
+              <option value="All">All Statuses</option>
+              <option value="APPLIED">APPLIED</option>
+              <option value="INTERVIEW">INTERVIEW</option>
+              <option value="REJECTED">REJECTED</option>
+            </select>
+          </div>
+        </div>
         {/* JOB LIST */}
         {isLoading ? (
           <div className="flex justify-center py-10">
             <Loader2 className="animate-spin" />
           </div>
-        ) : (
+        ) : 
+          jobs.length === 0 ? (
+  <p className="text-center text-gray-400">No jobs found</p>
+) : (
           <div className="grid md:grid-cols-3 gap-6">
-            {jobs.map((job) => (
+            {jobs.filter((job)=> {
+              const matchesSearch =
+            job.company.toLowerCase().includes(search.toLowerCase())||
+          job.position.toLowerCase().includes(search.toLowerCase())
+        
+        const matchesStatus = 
+          filterStatus === "All" || job.status === filterStatus
+
+          return matchesSearch && matchesStatus
+      })
+            .map((job) => (
               <div key={job._id} className="bg-white p-5 rounded-xl shadow">
 
                 <h3 className="font-semibold text-lg">{job.position}</h3>
