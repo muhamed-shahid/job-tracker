@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Loader2, MoreVertical, Edit2, Trash2, Search } from 'lucide-react';
+import { Loader2, MoreVertical, Edit2, Trash2, Search, Briefcase, Clock, CheckCircle2, XCircle } from 'lucide-react';
 import toast from 'react-hot-toast';
 import API from '../services/api';
 
@@ -51,6 +51,7 @@ const Dashboard = () => {
       setForm({ company: "", position: "", status: "APPLIED" });
       setEditId(null);
       setShowModal(false);
+      setActiveDropdown(false);
       fetchJobs();
 
     } catch (err) {
@@ -60,7 +61,11 @@ const Dashboard = () => {
   };
 
   const deleteJob = async (id) => {
-    if (!window.confirm("Delete this job?")) return;
+    if (!window.confirm("Delete this job?")){ 
+      setActiveDropdown(false)
+      return;
+      
+    }
 
     try {
       await API.delete(`/jobs/${id}`);
@@ -79,10 +84,22 @@ const Dashboard = () => {
     <div className="min-h-screen bg-gray-100">
 
       {/* HEADER */}
-      <div className="bg-white shadow p-4 flex justify-between">
-        <h1 className="text-xl font-bold text-indigo-600">JobTrack</h1>
-        <p>Welcome back</p>
-      </div>
+      <div className="bg-white shadow px-6 py-4 flex justify-between items-center">
+
+  <div className="flex items-center gap-2">
+    <div className="bg-indigo-600 text-white px-2 py-1 rounded">X</div>
+    <h1 className="font-bold text-lg">JobTrack</h1>
+  </div>
+
+  <div className="flex items-center gap-3">
+    <p className="text-gray-600">Welcome back</p>
+
+    <div className="w-8 h-8 bg-indigo-100 rounded-full flex items-center justify-center font-bold">
+      U
+    </div>
+  </div>
+
+</div>
 
       <div className="max-w-6xl mx-auto p-6">
 
@@ -104,6 +121,47 @@ const Dashboard = () => {
             + Add Application
           </button>
         </div>
+
+                {/* STATS SECTION */}
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+          <div className="bg-white rounded-xl p-5 card-shadow border border-slate-100 flex items-center gap-4 transition-all hover:shadow-lg">
+            <div className="w-12 h-12 bg-indigo-50 rounded-lg flex items-center justify-center text-indigo-600">
+              <Briefcase size={24} />
+            </div>
+            <div>
+              <p className="text-2xl font-bold text-slate-800">{jobs.length}</p>
+              <p className="text-sm font-medium text-slate-500">Total Jobs</p>
+            </div>
+          </div>
+          <div className="bg-white rounded-xl p-5 card-shadow border border-slate-100 flex items-center gap-4 transition-all hover:shadow-lg">
+            <div className="w-12 h-12 bg-blue-50 rounded-lg flex items-center justify-center text-blue-600">
+              <Clock size={24} />
+            </div>
+            <div>
+              <p className="text-2xl font-bold text-slate-800">{jobs.filter(j=>j.status==="APPLIED").length}</p>
+              <p className="text-sm font-medium text-slate-500">Applied</p>
+            </div>
+          </div>
+          <div className="bg-white rounded-xl p-5 card-shadow border border-slate-100 flex items-center gap-4 transition-all hover:shadow-lg">
+            <div className="w-12 h-12 bg-green-50 rounded-lg flex items-center justify-center text-green-600">
+              <CheckCircle2 size={24} />
+            </div>
+            <div>
+              <p className="text-2xl font-bold text-slate-800">{jobs.filter(j=> j.status === "INTERVIEW").length}</p>
+              <p className="text-sm font-medium text-slate-500">Interviews</p>
+            </div>
+          </div>
+          <div className="bg-white rounded-xl p-5 card-shadow border border-slate-100 flex items-center gap-4 transition-all hover:shadow-lg">
+            <div className="w-12 h-12 bg-red-50 rounded-lg flex items-center justify-center text-red-600">
+              <XCircle size={24} />
+            </div>
+            <div>
+              <p className="text-2xl font-bold text-slate-800">{jobs.filter(j=> j.status==="REJECTED").length}</p>
+              <p className="text-sm font-medium text-slate-500">Rejected</p>
+            </div>
+          </div>
+        </div>
+        
        {/* JOB FILTER AND SEARCH */}
                <div className="bg-white p-4 rounded-xl card-shadow border border-slate-100 mb-8 flex flex-col sm:flex-row gap-4">
           <div className="relative flex-1">
@@ -129,6 +187,7 @@ const Dashboard = () => {
             </select>
           </div>
         </div>
+
         {/* JOB LIST */}
         {isLoading ? (
           <div className="flex justify-center py-10">
@@ -191,7 +250,9 @@ const Dashboard = () => {
                         </button>
 
                         <button
-                          onClick={() => deleteJob(job._id)}
+                          onClick={() => {deleteJob(job._id);
+                                    setShowModal(false);}
+                          }
                           className="flex gap-2 text-red-500"
                         >
                           <Trash2 size={16}/> Delete
