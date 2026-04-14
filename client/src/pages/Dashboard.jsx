@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Loader2, MoreVertical, Edit2, Trash2, Search, Briefcase, Clock, CheckCircle2, XCircle, LogOut } from 'lucide-react';
+import { Loader2, MoreVertical, Edit2, Trash2, Search, Briefcase, Clock, CheckCircle2, XCircle, LogOut, AlertTriangle } from 'lucide-react';
 import toast from 'react-hot-toast';
 import API from '../services/api';
 
@@ -12,6 +12,7 @@ const Dashboard = () => {
 
   const [showModal, setShowModal] = useState(false);
   const [editId, setEditId] = useState(null);
+  const [deleteId, setDeleteId] = useState(null);
   const [activeDropdown, setActiveDropdown] = useState(null);
 
   const [form, setForm] = useState({
@@ -61,21 +62,16 @@ const Dashboard = () => {
     }
   };
 
-  const deleteJob = async (id) => {
-    if (!window.confirm("Delete this job?")){ 
-      setActiveDropdown(false)
-      return;
-      
-    }
-
-    try {
-      await API.delete(`/jobs/${id}`);
-      toast.success("Job deleted");
-      fetchJobs();
-    } catch {
-      toast.error("Delete failed");
-    }
-  };
+ const confirmDelete = async () => {
+  try {
+    await API.delete(`/jobs/${deleteId}`);
+    toast.success("Job deleted");
+    setDeleteId(null);
+    fetchJobs();
+  } catch {
+    toast.error("Delete failed");
+  }
+};
 
   const toggleOptions = (id) => {
     setActiveDropdown(activeDropdown === id ? null : id);
@@ -259,7 +255,7 @@ const Dashboard = () => {
                         </button>
 
                         <button
-                          onClick={() => {deleteJob(job._id);
+                          onClick={() => {setDeleteId(job._id);
                                     setShowModal(false);}
                           }
                           className="flex gap-2 text-red-500"
@@ -348,6 +344,44 @@ const Dashboard = () => {
 
     </div>
   </div>
+)}
+{deleteId && (
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/50 backdrop-blur-sm animate-fade-in">
+      <div className="bg-white rounded-2xl shadow-xl w-full max-w-sm overflow-hidden transform scale-100 transition-transform">
+        <div className="p-6 text-center">
+          <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
+            <AlertTriangle className="text-red-600" size={32} />
+          </div>
+          <h2 className="text-xl font-bold text-slate-800 mb-2">Delete Job?</h2>
+          <p className="text-slate-500 mb-6 text-sm">
+            Are you sure you want to delete this job application? This action cannot be undone.
+          </p>
+          
+          <div className="flex gap-3 w-full">
+            <button
+              onClick={()=>{setDeleteId(null)
+                            setActiveDropdown(null)
+              }}
+              disabled={isLoading}
+              className="flex-1 btn-secondary"
+            >
+              Cancel
+            </button>
+            <button
+              onClick={confirmDelete}
+              disabled={isLoading}
+              className="flex-1 bg-red-600 hover:bg-red-700 text-white font-medium py-2 px-4 rounded-lg transition-all duration-200 active:scale-95 shadow-md shadow-red-200 flex justify-center items-center"
+            >
+              {isLoading ? (
+                <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+              ) : (
+                'Delete'
+              )}
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
 )}
     </div>
   );
