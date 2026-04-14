@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Loader2, MoreVertical, Edit2, Trash2, Search, Briefcase, Clock, CheckCircle2, XCircle } from 'lucide-react';
+import { Loader2, MoreVertical, Edit2, Trash2, Search, Briefcase, Clock, CheckCircle2, XCircle, LogOut } from 'lucide-react';
 import toast from 'react-hot-toast';
 import API from '../services/api';
 
@@ -8,6 +8,7 @@ const Dashboard = () => {
   const [isLoading, setIsLoading] = useState(true);
   const[search,setSearch] = useState("")
   const[filterStatus,setFilterStatus] = useState("All")
+  const [showLogoutModal,setShowLogoutModal] = useState(false)
 
   const [showModal, setShowModal] = useState(false);
   const [editId, setEditId] = useState(null);
@@ -80,6 +81,11 @@ const Dashboard = () => {
     setActiveDropdown(activeDropdown === id ? null : id);
   };
 
+  const handleLogout = ()=>{
+    localStorage.removeItem("token")
+    window.location.href="/login"
+  }
+
   return (
     <div className="min-h-screen bg-gray-100">
 
@@ -97,6 +103,9 @@ const Dashboard = () => {
     <div className="w-8 h-8 bg-indigo-100 rounded-full flex items-center justify-center font-bold">
       U
     </div>
+   <button onClick={()=>setShowLogoutModal(true)} className="p-2 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors ml-2" title="Logout">
+              <LogOut size={20} />
+            </button>
   </div>
 
 </div>
@@ -313,6 +322,33 @@ const Dashboard = () => {
           </form>
         </div>
       )}
+
+      {showLogoutModal && (
+  <div className="fixed inset-0 bg-black/30 flex justify-center items-center">
+    <div className="bg-white p-6 rounded shadow w-80 text-center">
+
+      <h2 className="text-lg font-semibold mb-4">Confirm Logout</h2>
+      <p className="text-gray-500 mb-6">Are you sure you want to logout?</p>
+
+      <div className="flex justify-center gap-4">
+        <button
+          onClick={handleLogout}
+          className="bg-red-500 text-white px-4 py-2 rounded"
+        >
+          Logout
+        </button>
+
+        <button
+          onClick={() => setShowLogoutModal(false)}
+          className="px-4 py-2 border rounded"
+        >
+          Cancel
+        </button>
+      </div>
+
+    </div>
+  </div>
+)}
     </div>
   );
 };

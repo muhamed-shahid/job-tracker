@@ -2,6 +2,8 @@ import React from 'react'
 import { useState } from 'react'
 import API from "../services/api"
 import toast from 'react-hot-toast'
+import { Mail, Lock, LogIn, ArrowRight } from 'lucide-react';
+import { Link, useNavigate } from 'react-router-dom';
 
 export const Login = () => {
 
@@ -9,18 +11,24 @@ export const Login = () => {
         email:"",
         password:""
     })
+    const navigate = useNavigate()
+    const[isLoading,setIsLoading] = useState(false)
     const handleSubmit = async(e)=>{
         e.preventDefault(e)
+        setIsLoading(true)
         try{
             const res = await API.post("/auth/login", form)
                   setTimeout(() => {
         localStorage.setItem('token',res.data.token);
         toast.success('Successfully logged in!');
         navigate('/dashboard');
+        setIsLoading(false)
       }, 1000);
             
         }catch(err){
             console.log(err);
+            toast.error("Invalid Credentials")
+            setIsLoading(false)
             
         }
     }
@@ -40,7 +48,7 @@ export const Login = () => {
         <div className="bg-white p-8 rounded-2xl card-shadow border border-slate-100">
           <form onSubmit={handleSubmit} className="space-y-5">
             <div className="space-y-1.5">
-              <label className="text-sm font-medium text-slate-700">Email format</label>
+              <label className="text-sm font-medium text-slate-700">Email</label>
               <div className="relative">
                 <Mail className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={20} />
                 <input
@@ -69,7 +77,7 @@ export const Login = () => {
               </div>
             </div>
 
-            <div className="flex items-center justify-between pb-2">
+            {/* <div className="flex items-center justify-between pb-2">
               <label className="flex items-center gap-2">
                 <input type="checkbox" className="w-4 h-4 rounded border-slate-300 text-indigo-600 focus:ring-indigo-500" />
                 <span className="text-sm text-slate-600">Remember me</span>
@@ -77,7 +85,7 @@ export const Login = () => {
               <a href="#" className="text-sm font-medium text-indigo-600 hover:text-indigo-500">
                 Forgot password?
               </a>
-            </div>
+            </div> */}
 
             <button type="submit" disabled={isLoading} className="btn-primary w-full flex items-center justify-center gap-2">
               {isLoading ? (
