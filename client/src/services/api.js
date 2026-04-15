@@ -1,6 +1,6 @@
 import axios from "axios"
 
-const API = axios.create({baseURL:"http://localhost:8851/api"})
+const API = axios.create({baseURL:"https://job-tracker-dvq9.onrender.com/api"})
 
 API.interceptors.request.use((req)=>{
     const token = localStorage.getItem("token")
